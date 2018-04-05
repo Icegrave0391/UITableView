@@ -81,7 +81,7 @@
     }
     NSString * text = [NSString stringWithFormat:@"%ld",(long)indexPath.row] ;
     cell.textLabel.text = text ;
-    cell.detailTextLabel.text = @"this is a learning test" ;
+    cell.detailTextLabel.text = @"learning test" ;
     cell.detailTextLabel.textColor = [UIColor grayColor];
     cell.accessoryType = UITableViewCellAccessoryNone ;
     return cell ;
