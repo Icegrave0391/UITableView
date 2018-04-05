@@ -8,15 +8,85 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+@interface ViewController ()<UITableViewDelegate,UITableViewDataSource>
+@property(nonatomic,strong)UITableView * tableView ;
 
 @end
 
 @implementation ViewController
 
+-(UITableView *)tableView{
+    if(_tableView == nil) {
+        _tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain] ;
+        _tableView.dataSource = self ;
+        _tableView.delegate = self ;
+    }
+    return _tableView ;
+}
+
+//dataSource
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 20 ;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    //reuse
+    static NSString * cellID = @"cell" ;
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID] ;
+    if(cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID] ;
+    }
+    NSString * text = [NSString stringWithFormat:@"%ld",(long)indexPath.row] ;
+    cell.textLabel.text = text ;
+    return cell ;
+}
+
+//delegate
+-(BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath{
+    return YES ;
+}
+-(void)tableView:(UITableView *)tableView didHighlightRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath] ;
+    cell.textLabel.text = @"highlighted" ;
+}
+-(NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"在%@调用willselect方法",indexPath) ;
+    UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath] ;
+    cell.textLabel.text = [NSString stringWithFormat:@"cell at %@ will select",indexPath] ;
+    return indexPath ;
+}
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"调用didselect方法") ;
+    UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath] ;
+    cell.textLabel.text = @"didselect" ;
+    printf("调用didselect方法\n") ;
+}
+-(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCell * cell = [self.tableView cellForRowAtIndexPath:indexPath] ;
+    cell.textLabel.text = [NSString stringWithFormat:@"%ld",(long)indexPath.row] ;
+    
+}
+
+//cell的编辑方法
+
+//设置按钮
+-(NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewRowAction * action1 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"添加" handler:nil] ;
+    UITableViewRowAction * action2 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"移动" handler:nil] ;
+    UITableViewRowAction * action3 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:@"删除" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        NSLog(@"删除的单元格在第%ld行", (long)indexPath.row) ;
+        [tableView reloadData] ;
+    }];
+    
+    NSArray * actionArray = @[action1,action2,action3] ;
+    
+    return actionArray ;
+}
+//
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    [self.view addSubview:self.tableView] ;
 }
 
 
